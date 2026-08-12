@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Weather Dashboard</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            background: linear-gradient(120deg, #2193b0, #6dd5ed);
+        }
+
+        .container {
+            width: 400px;
+            max-width: 100%;
+            background: white;
+            padding: 25px;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 10px 30px #0004;
+        }
+
+        h1 {
+            color: #0077ff;
+            margin-bottom: 20px;
+        }
+
+        .input-group {
+            margin-bottom: 12px;
+            text-align: left;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: bold;
+            color: #333;
+            font-size: 14px;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 12px;
+            border-radius: 10px;
+            border: 1px solid #aaa;
+            outline: none;
+            font-size: 14px;
+        }
+
+        .input-group input:focus {
+            border-color: #0077ff;
+            box-shadow: 0 0 5px #0077ff55;
+        }
+
+        .search {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .search input {
+            flex: 1;
+            padding: 12px;
+            border-radius: 10px;
+            border: 1px solid #aaa;
+            outline: none;
+            font-size: 14px;
+        }
+
+        .search input:focus {
+            border-color: #0077ff;
+        }
+
+        button {
+            padding: 12px 18px;
+            border: none;
+            border-radius: 10px;
+            background: #0077ff;
+            color: white;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.2s;
+        }
+
+        button:hover {
+            background: #005fcc;
+            transform: translateY(-1px);
+        }
+
+        button:disabled {
+            background: #999;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .weather {
+            margin-top: 25px;
+        }
+
+        .weather h2 {
+            margin: 10px 0;
+        }
+
+        .temp {
+            font-size: 45px;
+            font-weight: bold;
+            color: #0077ff;
+        }
+
+        .icon {
+            font-size: 60px;
+        }
+
+        .info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .card {
+            background: #eef7ff;
+            padding: 12px;
+            border-radius: 10px;
+            font-size: 14px;
+        }
+
+        .card strong {
+            display: block;
+            margin-top: 5px;
+            font-size: 16px;
+        }
+
+        .error {
+            color: #d60000;
+            font-weight: bold;
+        }
+
+        .success {
+            color: #008000;
+            font-weight: bold;
+        }
+
+        .note {
+            margin-top: 15px;
+            font-size: 12px;
+            color: #777;
+        }
+
+        @media (max-width: 450px) {
+            .search {
+                flex-direction: column;
+            }
+
+            button {
+                width: 100%;
+            }
+
+            .info {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+
+        <h1>🌤 Weather Dashboard</h1>
+
+        <!-- API KEY INPUT -->
+        <div class="input-group">
+            <label for="apiKey">🔑 OpenWeatherMap API Key</label>
+
+            <input
+                type="password"
+                id="apiKey"
+                placeholder="Enter your API key"
+                autocomplete="off"
+            >
+        </div>
+
+        <!-- CITY INPUT -->
+        <div class="input-group">
+            <label for="city">🏙️ City Name</label>
+
+            <div class="search">
+                <input
+                    type="text"
+                    id="city"
+                    placeholder="Enter city name"
+                    autocomplete="off"
+                >
+
+                <button id="btn" onclick="getWeather()">
+                    Search
+                </button>
+            </div>
+        </div>
+
+        <!-- WEATHER RESULT -->
+        <div id="weather" class="weather">
+            <p>Enter your API key and search your city 🌍</p>
+        </div>
+
+        <div class="note">
+            🔒 Your API key is used only in your browser and is not hardcoded in this page.
+        </div>
+
+    </div>
+
+    <script>
+
+        async function getWeather() {
+
+            const API_KEY = document.getElementById("apiKey").value.trim();
+            const city = document.getElementById("city").value.trim();
+
+            const weatherBox = document.getElementById("weather");
+            const button = document.getElementById("btn");
+
+            // Check API Key
+            if (API_KEY === "") {
+
+                weatherBox.innerHTML =
+                    '<p class="error">❌ Please enter your OpenWeatherMap API key.</p>';
+
+                document.getElementById("apiKey").focus();
+
+                return;
+            }
+
+            // Check City
+            if (city === "") {
+
+                weatherBox.innerHTML =
+                    '<p class="error">❌ Please enter a city name.</p>';
+
+                document.getElementById("city").focus();
+
+                return;
+            }
+
+            // Loading
+            weatherBox.innerHTML =
+                "<p>⏳ Loading weather data...</p>";
+
+            button.disabled = true;
+            button.innerText = "Loading...";
+
+            // OpenWeatherMap API URL
+            const url =
+                `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(city)}&appid=${encodeURIComponent(API_KEY)}&units=metric`;
+
+            try {
+
+                const response = await fetch(url);
+
+                const data = await response.json();
+
+                // API Error
+                if (!response.ok || data.cod !== 200) {
+
+                    if (data.cod === 401) {
+                        throw new Error("Invalid API key.");
+                    }
+
+                    if (data.cod === 404) {
+                        throw new Error("City not found.");
+                    }
+
+                    throw new Error(
+                        data.message || "Unable to fetch weather data."
+                    );
+                }
+
+                // Weather Icon
+                const weatherMain = data.weather[0].main;
+
+                let icon = "🌤️";
+
+                if (weatherMain === "Clear") {
+                    icon = "☀️";
+                }
+                else if (weatherMain === "Clouds") {
+                    icon = "☁️";
+                }
+                else if (weatherMain === "Rain") {
+                    icon = "🌧️";
+                }
+                else if (weatherMain === "Drizzle") {
+                    icon = "🌦️";
+                }
+                else if (weatherMain === "Thunderstorm") {
+                    icon = "⛈️";
+                }
+                else if (weatherMain === "Snow") {
+                    icon = "❄️";
+                }
+                else if (weatherMain === "Mist" ||
+                         weatherMain === "Fog" ||
+                         weatherMain === "Haze") {
+                    icon = "🌫️";
+                }
+
+                // Display Weather
+                weatherBox.innerHTML = `
+
+                    <div class="icon">${icon}</div>
+
+                    <h2>
+                        ${escapeHTML(data.name)}, ${escapeHTML(data.sys.country)}
+                    </h2>
+
+                    <div class="temp">
+                        ${Math.round(data.main.temp)} °C
+                    </div>
+
+                    <p>
+                        ${escapeHTML(data.weather[0].description)}
+                    </p>
+
+                    <div class="info">
+
+                        <div class="card">
+                            💧 Humidity
+                            <strong>
+                                ${data.main.humidity}%
+                            </strong>
+                        </div>
+
+                        <div class="card">
+                            🌬 Wind
+                            <strong>
+                                ${data.wind.speed} m/s
+                            </strong>
+                        </div>
+
+                        <div class="card">
+                            🌡 Feels Like
+                            <strong>
+                                ${Math.round(data.main.feels_like)} °C
+                            </strong>
+                        </div>
+
+                        <div class="card">
+                            📊 Pressure
+                            <strong>
+                                ${data.main.pressure} hPa
+                            </strong>
+                        </div>
+
+                    </div>
+
+                    <p class="success">
+                        ✅ Weather data loaded successfully
+                    </p>
+                `;
+
+            }
+
+            catch (error) {
+
+                weatherBox.innerHTML = `
+                    <p class="error">
+                        ❌ ${escapeHTML(error.message)}
+                    </p>
+                `;
+
+            }
+
+            finally {
+
+                button.disabled = false;
+                button.innerText = "Search";
+
+            }
+        }
+
+
+        // Prevent HTML injection when displaying API data
+        function escapeHTML(value) {
+
+            return String(value)
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+
+        }
+
+
+        // Press Enter to search
+        document.getElementById("city").addEventListener("keydown", function(event) {
+
+            if (event.key === "Enter") {
+                getWeather();
+            }
+
+        });
+
+
+        document.getElementById("apiKey").addEventListener("keydown", function(event) {
+
+            if (event.key === "Enter") {
+                document.getElementById("city").focus();
+            }
+
+        });
+
+    </script>
+
+</body>
+
+</html>
