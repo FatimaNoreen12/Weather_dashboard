@@ -5,7 +5,7 @@ A responsive and user-friendly **Weather Dashboard** that provides real-time wea
 
 ## 🚀 Live Demo
 
-🔗 **[Open Weather Dashboard](https://fatimanoreen12.github.io/Weather_dashboard/)**
+🔗 **[Open Weather Dashboard](https://fatimanoreen12.github.io/Weather_dashboard/) **
 
 ---
 
