@@ -1,6 +1,4 @@
 
-https://github.com/user-attachments/assets/02c24105-6cbd-4e5a-a1b3-fe2178719cca
-
 # 🌤️ Weather Dashboard
 
 A responsive and user-friendly **Weather Dashboard** that provides real-time weather information for cities around the world.
